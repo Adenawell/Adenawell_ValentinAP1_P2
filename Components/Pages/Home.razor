@@ -1,7 +1,24 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject IToastService ToastService
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container">
 
-Welcome to your new app.
+    <div class="card-header">
+        <h1>Adenawell Torres 2023-0647 </h1>
+
+        Primer Parcial, Programaci&oacute;n Aplicada 1
+    </div>
+    
+    <div class="card-body">
+        <button class="btn btn-primary" @onclick="Saludar">Probar Toast</button>
+    </div>
+    
+
+</div>
+
+
+@code {
+    void Saludar() => ToastService.ShowSuccess("TodoFuncional");
+}
