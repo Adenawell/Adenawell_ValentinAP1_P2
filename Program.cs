@@ -1,10 +1,26 @@
 using Adenawell_ValentinAP1_P2.Components;
+using Adenawell_ValentinAP1_P2.DAL;
+using Adenawell_ValentinAP1_P2.Models;
+using Adenawell_ValentinAP1_P2.Services;
+using Blazored.Toast;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+
+var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
+
+
+
+builder.Services.AddDbContextFactory<Contexto>(options => options.UseSqlServer(ConStr));
+
+builder.Services.AddBlazoredToast();
+
+builder.Services.AddScoped<ViajesEspacialesServices>();
 
 var app = builder.Build();
 
