@@ -1,0 +1,99 @@
+﻿@page "/viajesespaciales/Index"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject NavigationManager navManager
+@inject IToastService toastService
+
+<PageTitle>Consulta de Viajes Espaciales</PageTitle>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 text-dark">Consulta de Viajes Espaciales</h5>
+        <button class="btn btn-primary" @onclick="Crear">
+            <i class="fa-solid fa-plus"></i> + Crear
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div class="row mb-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Filtrar por:</label>
+                <select class="form-select" @bind="FiltroPor">
+                    <option value="id">ID</option>
+                    <option value="nombre">Nombre</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Búsqueda:</label>
+                <input type="text" class="form-control" placeholder="Escribe aquí..." @bind="TextoBusqueda" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Desde:</label>
+                <input type="date" class="form-control" @bind="Desde" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Hasta:</label>
+                <input type="date" class="form-control" @bind="Hasta" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100" @onclick="AplicarFiltros">
+                    <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                </button>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col text-end">
+                <button class="btn btn-outline-secondary btn-sm" @onclick="RestablecerFiltros">
+                    <i class="fa-solid fa-arrow-rotate-right"></i> Restablecer Filtros
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <QuickGrid Items="@Viajes.AsQueryable()" Class="table table-striped table-hover mt-3">
+                <PropertyColumn Title="ID" Property="@(v => v.Id)" />
+                <PropertyColumn Title="Nombre" Property="@(v => v.Nombre)" />
+                <PropertyColumn Title="Fecha" Property="@(v => v.Fecha)" Format="yyyy-MM-dd" />
+                <PropertyColumn Title="Costo" Property="@(v => v.Costo)" Format="N2" />
+            </QuickGrid>
+        </div>
+    </div>
+
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+        <span class="text-muted">@Viajes.Count items</span>
+        <div class="d-flex align-items-center text-muted">
+            <span class="me-3">Conteo: @Viajes.Count</span>
+            <span>Page <b>1</b> of 1</span>
+        </div>
+    </div>
+</div>
+
+@code {
+    public class Viaje
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = "";
+        public DateTime Fecha { get; set; }
+        public decimal Costo { get; set; }
+    }
+
+    private List<Viaje> Viajes = new();
+    private string FiltroPor = "id";
+    private string TextoBusqueda = "";
+    private DateOnly? Desde;
+    private DateOnly? Hasta;
+
+    private void Crear()
+    {
+        navManager.NavigateTo("/ViajesCreate");
+    }
+
+    private void AplicarFiltros()
+    {
+    }
+
+    private void RestablecerFiltros()
+    {
+    }
+}

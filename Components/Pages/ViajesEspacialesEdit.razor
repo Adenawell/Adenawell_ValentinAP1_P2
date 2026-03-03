@@ -1,0 +1,29 @@
+﻿@page "/ViajesEdit/{ViajeID:int}"
+@rendermode InteractiveServer
+@inject NavigationManager navManager
+
+<PageTitle>Editar Viaje</PageTitle>
+
+<h3>Editar Viaje</h3>
+
+<div class="mb-3">
+    <label class="form-label">ViajesID</label>
+    <input type="number" class="form-control" @bind="ViajeID" />
+</div>
+
+<button class="btn btn-primary me-2" @onclick="Guardar">Guardar</button>
+<button class="btn btn-secondary" @onclick="Volver">Volver</button>
+
+@code {
+
+    [Parameter] public int ViajeID { get; set; }
+
+
+    private void Guardar()
+    {
+    }
+
+    private void Volver()
+    {
+    }
+}
