@@ -20,7 +20,10 @@ builder.Services.AddDbContextFactory<Contexto>(options => options.UseSqlServer(C
 
 builder.Services.AddBlazoredToast();
 
-builder.Services.AddScoped<ViajesEspacialesServices>();
+builder.Services.AddScoped<AsignacionPuntosServices>();
+builder.Services.AddScoped<EstudiantesService>();
+builder.Services.AddScoped<TiposPuntosService>();
+
 
 var app = builder.Build();
 
