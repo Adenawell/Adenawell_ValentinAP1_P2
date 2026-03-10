@@ -4,38 +4,144 @@ using Microsoft.EntityFrameworkCore;
 namespace Adenawell_ValentinAP1_P2.DAL;
 
 public class Contexto : DbContext
+
 {
-    public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
+    public Contexto(DbContextOptions<Contexto> options) : base(options)
 
-    public DbSet<ViajesEspaciales> ViajesEspaciales { get; set; }
+    {
+
+    }
+
+    public DbSet<AsignacionesPuntos> AsignacionPuntos{ get; set; }
+
+    public DbSet<AsignacionPuntosDetalles> Detalles { get; set; }
+    public DbSet<Estudiantes> Estudiantes { get; set; }
+
+    public DbSet<TiposPuntos> TiposPuntos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
+
     {
+
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<ViajesEspaciales>().HasData(
-            new ViajesEspaciales
+        modelBuilder.Entity<Estudiantes>().HasData(
+
+            new Estudiantes
+
             {
-                ViajeId = 1,
-                Nombre = "Misión a Marte",
-                Fecha = new DateTime(2026, 05, 20),
-                Costo = 1500000.00m
+
+                EstudianteId = 1,
+
+                Nombres = "Ana Martínez",
+
+                Email = "ana@universidad.edu",
+
+                Edad = 20,
+
+                BalancePuntos = 0
+
             },
-            new ViajesEspaciales
+
+            new Estudiantes
+
             {
-                ViajeId = 2,
-                Nombre = "Tour Lunar",
-                Fecha = new DateTime(2026, 08, 15),
-                Costo = 500000.00m
+
+                EstudianteId = 2,
+
+                Nombres = "Carlos Pérez",
+
+                Email = "carlos@universidad.edu",
+
+                Edad = 22,
+
+                BalancePuntos = 0
+
             },
-            new ViajesEspaciales
+
+            new Estudiantes
+
             {
-                ViajeId = 3,
-                Nombre = "Exploración de Europa (Júpiter)",
-                Fecha = new DateTime(2027, 12, 01),
-                Costo = 9999999.99m
+
+                EstudianteId = 3,
+
+                Nombres = "Laura Rodríguez",
+
+                Email = "laura@universidad.edu",
+
+                Edad = 21,
+
+                BalancePuntos = 0
+
             }
+
         );
+
+        modelBuilder.Entity<TiposPuntos>().HasData(
+
+            new TiposPuntos
+
+            {
+
+                TipoId = 1,
+
+                Nombre = "Participación",
+
+                Descripcion = "Participación en clase",
+
+                ValorPuntos = 5,
+
+                Color = "primary",
+
+                Icono = "bi-hand-thumbs-up",
+
+                Activo = true
+
+            },
+
+            new TiposPuntos
+
+            {
+
+                TipoId = 2,
+
+                Nombre = "Tarea Entregada",
+
+                Descripcion = "Entrega de tarea",
+
+                ValorPuntos = 10,
+
+                Color = "success",
+
+                Icono = "bi-journal-check",
+
+                Activo = true
+
+            },
+
+            new TiposPuntos
+
+            {
+
+                TipoId = 3,
+
+                Nombre = "Proyecto",
+
+                Descripcion = "Entrega de proyecto",
+
+                ValorPuntos = 20,
+
+                Color = "warning",
+
+                Icono = "bi-lightbulb",
+
+                Activo = true
+
+            }
+
+        );
+
     }
+
 }
