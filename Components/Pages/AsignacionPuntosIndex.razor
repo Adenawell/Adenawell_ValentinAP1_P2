@@ -1,0 +1,124 @@
+﻿@page "/asignacionPuntos/Index"
+@rendermode InteractiveServer
+@using Adenawell_ValentinAP1_P2.Models
+@using Adenawell_ValentinAP1_P2.Services
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.IdentityModel.Tokens
+@inject AsignacionPuntosServices services;
+@inject NavigationManager navManager
+@inject IToastService toastService
+
+<PageTitle>Registro Puntos Estudiantiles</PageTitle>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 text-dark">Registro Puntos Estudiantiles</h5>
+        <button class="btn btn-primary" @onclick="IrACrear">
+            <i class="fa-solid fa-plus"></i> Crear Asignacion Puntos
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div class="row mb-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Seleccione un filtro:</label>
+                <select class="form-select" @bind="FiltroPor">
+                    <option value="">Selecciona Uno</option>
+                    <option value="nombre">Nombre</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Bussqueda:</label>
+                <input type="text" class="form-control" placeholder="Escribe lo que vas a buscar" @bind="TextoBusqueda" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Desde:</label>
+                <input type="date" class="form-control" @bind="Desde" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Hasta:</label>
+                <input type="date" class="form-control" @bind="Hasta" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary" @onclick="Buscar" >Buscar</button>
+            </div>
+            
+        </div>
+
+        
+
+        <div class="table-responsive">
+            <QuickGrid Items="@asignacionPuntos.AsQueryable()" Class="table table-striped table-hover mt-3" @Pagination="paginationState">
+                <PropertyColumn Property="@(e=> e.IdAsignacion)" Title="IdAsignacion" Sortable="true"></PropertyColumn>
+                <PropertyColumn Property="@(e=>e.Fecha)" Title="Fecha" Sortable="true" Format="dd/MM/yyyy"></PropertyColumn>
+                <PropertyColumn Property="@(e => e.Estudiantes.Nombres)" Title="Nombre Estudiante" />
+                <PropertyColumn Property="@(e => e.TotalPuntos)" Title="Total Puntos" />
+
+                <TemplateColumn >
+                    <button class="btn btn-outline-secondary" @onclick="()=> IrAEdit(context.IdAsignacion)">Editar</button>
+                </TemplateColumn>
+            </QuickGrid>
+        </div>
+    </div>
+
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+        <span class="text-muted">@asignacionPuntos.Count items</span>
+        <div class="d-flex align-items-center text-muted">
+            <span class="me-3">Conteo: @asignacionPuntos.Count</span>
+            <span>Page <b>1</b> of 1</span>
+            <Paginator State="@paginationState"></Paginator>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public List<AsignacionesPuntos> asignacionPuntos = new List<AsignacionesPuntos>();
+
+    private string FiltroPor = "";
+    private string TextoBusqueda = "";
+    private DateTime? Desde = DateTime.Now;
+    private DateTime? Hasta = DateTime.Now;
+    PaginationState paginationState = new PaginationState() { ItemsPerPage = 10 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        asignacionPuntos = await services.Listar(e => e.IdAsignacion > 0);
+    }
+
+    public async Task Buscar()
+    {
+
+        if(Desde.HasValue && Hasta.HasValue)
+        {
+            asignacionPuntos = await services.Listar(xaaa => xaaa.Fecha >= Desde && xaaa.Fecha <= Hasta);
+        }
+
+        if(FiltroPor != null)
+        {
+            if (!TextoBusqueda.IsNullOrEmpty())
+            {
+                if(FiltroPor == "Nombre")
+                {
+                    asignacionPuntos = await services.Listar(xeee => xeee.Estudiantes.Nombres.ToLower().Contains(TextoBusqueda.ToLower()));
+                }
+                
+            }
+
+        }
+        else
+        {
+            asignacionPuntos = await services.Listar(e => e.IdAsignacion > 0);
+        }
+
+        
+
+    }
+    public void IrACrear() => navManager.NavigateTo("/AsignacionesPuntos/Create");
+    public void IrAEdit(int id) => navManager.NavigateTo($"/AsignacionPuntos/Edit/{id}");
+    
+
+
+    
+    
+}

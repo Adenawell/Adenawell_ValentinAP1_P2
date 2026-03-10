@@ -1,0 +1,137 @@
+﻿@page "/AsignacionPuntos/Edit/{AsignID:int}"
+@using Adenawell_ValentinAP1_P2.Models
+@using Adenawell_ValentinAP1_P2.Services
+@using Microsoft.AspNetCore.Components.QuickGrid
+@rendermode InteractiveServer
+@inject AsignacionPuntosServices asignacionesPuntosService
+@inject EstudiantesService estudiantesService
+@inject TiposPuntosService tiposPuntosService
+@inject NavigationManager navigationManager
+@inject IToastService toastService
+
+<PageTitle>Edits asignacion de puntos</PageTitle>
+
+<EditForm Model="AsignacionesPunto" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h5 class="card-title">Editar Asignacion</h5>
+            </div>
+            <div class="card-body">
+                <div>
+                    <label class="form-label">Fecha</label>
+                    <InputDate class="form-control" @bind-Value="AsignacionesPunto.Fecha"></InputDate>
+                    
+                </div>
+                <div>
+                    <label class="form-label">Nombre</label>
+                    
+                    <InputSelect @bind-Value="AsignacionesPunto.EstudianteId" class="form-select">
+                        <option value="0">Seleccione un Estudiante</option>
+                        @foreach (var estudiante in ListaEstudiantes)
+                        {
+                            <option value="@estudiante.EstudianteId">@estudiante.Nombres</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div>
+                    <label class="form-label">Total Puntos</label>
+                    <InputNumber @bind-Value="AsignacionesPunto.TotalPuntos" class="form-control" readonly></InputNumber>
+                </div>
+
+                <div class="mt-2">
+                    <h5>Lista de Detalles Puntos</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label">Seleccione una opcion</label>
+                            <InputSelect class="form-select" @bind-Value="Detalle.TipoPuntoId">
+                                <option value="0">Seleccione una opcion</option>
+                                @foreach (var detalle in ListaTipos)
+                                {
+                                    <option value="@detalle.TipoId">@detalle.Nombre</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-3">
+                            <button type="button" class="btn btn-outline-primary mt-4" @onclick="RegistrarDetalle">Agregar</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <QuickGrid Items="AsignacionesPunto.ListadoDetalles.AsQueryable()" Class="table table-bordered">
+                            <PropertyColumn Property="@(p => p.TipoPuntoId)" Title="TipoPuntoId" />
+                            <PropertyColumn Property="@(p => ListaTipos.FirstOrDefault(e => e.TipoId == p.TipoPuntoId).Nombre)" Title="Nombre Punto" />
+                            <PropertyColumn Property="@(p => ListaTipos.FirstOrDefault(e => e.TipoId == p.TipoPuntoId).ValorPuntos)" Title="Cantidad Puntos" />
+                            <TemplateColumn Context="detalle" Title="Opcion">
+                                <a class="btn btn-outline-danger" @onclick="() => EliminarDetalle(detalle)">Eliminar Detalle</a>
+                            </TemplateColumn>
+
+                        </QuickGrid>
+                    </div>
+
+                    
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-center gap-2">
+                <button class="btn btn-outline-secondary" @onclick="IrAIndex">Volver</button>
+                <button class="btn btn-outline-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public int AsignID { get; set; }
+    public AsignacionesPuntos AsignacionesPunto = new AsignacionesPuntos();
+    public List<TiposPuntos> ListaTipos = new List<TiposPuntos>();
+    public List<Estudiantes> ListaEstudiantes = new List<Estudiantes>();
+    public AsignacionPuntosDetalles Detalle = new AsignacionPuntosDetalles();
+    protected override async Task OnInitializedAsync()
+    {
+        AsignacionesPunto = await asignacionesPuntosService.Busqueda(AsignID);
+        ListaTipos = await tiposPuntosService.Listar(e => e.TipoId > 0);
+        ListaEstudiantes = await estudiantesService.Listar(e => e.EstudianteId > 0);
+        
+    }
+    private async Task Guardar()
+    {
+        var Entrada = await asignacionesPuntosService.Guardar(AsignacionesPunto);
+        if (Entrada)
+        {
+            toastService.ShowSuccess("Se ha Editado correctamente");
+            IrAIndex();
+        }
+        
+    }
+
+    private void RegistrarDetalle()
+    {
+        if (Detalle == null || AsignacionesPunto.ListadoDetalles.Any(e => e.TipoPuntoId == Detalle.TipoPuntoId))
+        {
+            toastService.ShowError("No se puede agregar el detalle es null");
+            return;
+        }
+        var TipoPunto = ListaTipos.FirstOrDefault(e => e.TipoId == Detalle.TipoPuntoId);
+        AsignacionesPunto.ListadoDetalles.Add(
+            new AsignacionPuntosDetalles
+            {
+                TipoPuntoId = TipoPunto.TipoId,
+                CantidadPuntos = TipoPunto.ValorPuntos
+            }
+        );
+        CalcularTotal();
+        Detalle = new AsignacionPuntosDetalles();
+    }
+    private void EliminarDetalle(AsignacionPuntosDetalles item)
+    {
+        AsignacionesPunto.ListadoDetalles.Remove(item);
+        CalcularTotal();
+        Detalle = item;
+    }
+    private void CalcularTotal()
+    {
+        AsignacionesPunto.TotalPuntos = AsignacionesPunto.ListadoDetalles.Sum(p => p.CantidadPuntos);
+    }
+
+    public void IrAIndex() => navigationManager.NavigateTo("/asignacionPuntos/Index");
+}
