@@ -57,16 +57,39 @@
                             <button type="button" class="btn btn-outline-primary mt-4" @onclick="RegistrarDetalle">Agregar</button>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <QuickGrid Items="AsignacionesPunto.ListadoDetalles.AsQueryable()" Class="table table-bordered">
-                            <PropertyColumn Property="@(p => p.TipoPuntoId)" Title="TipoPuntoId" />
-                            <PropertyColumn Property="@(p => ListaTipos.FirstOrDefault(e => e.TipoId == p.TipoPuntoId).Nombre)" Title="Nombre Punto" />
-                            <PropertyColumn Property="@(p => ListaTipos.FirstOrDefault(e => e.TipoId == p.TipoPuntoId).ValorPuntos)" Title="Cantidad Puntos" />
-                            <TemplateColumn Context="detalle" Title="Opcion">
-                                <a class="btn btn-outline-danger" @onclick="() => EliminarDetalle(detalle)">Eliminar Detalle</a>
-                            </TemplateColumn>
-
-                        </QuickGrid>
+                    <div class="table-responsive mt-2">
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>TipoPuntoId</th>
+                                    <th>Nombre Punto</th>
+                                    <th>Cantidad Puntos</th>
+                                    <th>Opcion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+ 
+                                @if (AsignacionesPunto.ListadoDetalles != null && AsignacionesPunto.ListadoDetalles.Any())
+                                {
+                                    foreach (var detalle in AsignacionesPunto.ListadoDetalles)
+                                    {
+                                        var tipoPunto = ListaTipos.FirstOrDefault(e => e.TipoId == detalle.TipoPuntoId);
+                    
+                                        <tr>
+                                            <td>@detalle.TipoPuntoId</td>
+                                            <td>@(tipoPunto?.Nombre)</td>
+                                            <td>@(tipoPunto?.ValorPuntos)</td>
+                                            <td>
+  
+                                                <button type="button" class="btn btn-outline-danger" @onclick="() => EliminarDetalle(detalle)">
+                                                    Eliminar Detalle
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
                     </div>
 
                     
